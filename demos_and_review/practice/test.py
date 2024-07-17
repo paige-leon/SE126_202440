@@ -1,5 +1,7 @@
-#Comment
-#Your name, Lab #, Date
+#Paige Leon
+#Lab 
+#Date
+#PROGRAM PROMPT:
 #Variable Dictionary
 #-----------------------------------
 
