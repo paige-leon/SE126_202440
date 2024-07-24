@@ -1,7 +1,7 @@
 #Paige Leon
 #Lab #02
 #Date 7/24/24
-#PROGRAM PROMPT:
+#PROGRAM PROMPT: parse all this stuff to make it a nice table.  
 
 
 #Variable Dictionary
