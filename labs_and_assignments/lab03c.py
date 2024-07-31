@@ -96,4 +96,4 @@ for i in range(0, records): #<--- goes from zero to records minus one
         elif device[i] == "Laptop":
             cost += 1500
 
-
+print(f"\n\n\tIt will cost ${cost:.2f} to replace the old computers")
