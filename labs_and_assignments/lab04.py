@@ -6,6 +6,21 @@
 
 #Variable Dictionary
 #-----------------------------------
+#nameFirst = []     \
+#nameLast = []       \
+#age = []             \
+#nickname = []        /------Parallel lists.  All Strings except age 
+#house = []          /
+#motto = []         /
+#count = 0           Total number of people scanned
+#totAge = 0          Total age of all people combined.  Used for calculating avg
+#avgAge              totAge/count
+#starks = ""         \
+#baratheons = ""      \
+#tullys = ""            -----  [variable name] += "|" to tally house counts
+#watchs = ""          /
+#lannisters = ""     /
+#targaryens = ""    /
 
 #---Imports---------------
 import csv
@@ -64,7 +79,7 @@ print(f"\n\n{"First Name":10}\t| {"Last Name":10}\t| {"Age":3}\t| {"Nickname":15
 print("================================================================================================================")
 for i in range(0, len(house)):
     
-    #assign a motto
+    #assign a motto based on house name.  Shrimple as that
     if house[i] == "House Stark":
         starks += "|"
         motto.append("It's so so cold :(")
