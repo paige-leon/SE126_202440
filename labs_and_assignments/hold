@@ -1,0 +1,44 @@
+def stats():
+
+    print(f"\n\nCards in Deck: {len(decklist)}")
+    print(f" Unique Cards: {uniqueCards}")
+    print("\n--------------------------------")
+    if creatures != 0: print(f"    Creatures |{"#" * creatures}")
+    if instants != 0: print(f"     Instants |{"#" * instants}")
+    if sorceries != 0: print(f"    Sorceries |{"#" * sorceries}")
+    if enchantments != 0: print(f" Enchantments |{"#" * enchantments}")
+    if artifacts != 0: print(f"    Artifacts |{"#" * artifacts}")
+    if planeswalkers != 0: print(f"Planeswalkers |{"#" * planeswalkers}")
+    if lands != 0: print(f"        Lands |{"#" * lands}")
+
+    print("--------------------------------\n")
+
+    #color pie
+    white = 0
+    blue = 0
+    black = 0
+    red = 0
+    green = 0
+    colorless = 0
+
+    #check for colors
+    for i in range(0, len(decklist)):
+        if "W" in decklist[i][MANACOST]:
+            white += 1
+        if "U" in decklist[i][MANACOST]:
+            blue += 1
+        if "B" in decklist[i][MANACOST]:
+            black += 1
+        if "R" in decklist[i][MANACOST]:
+            red += 1
+        if "G" in decklist[i][MANACOST]:
+            green += 1
+        if "W" not in decklist[i][MANACOST] and "U" not in decklist[i][MANACOST] and "B" not in decklist[i][MANACOST] and "R" not in decklist[i][MANACOST] and "G" not in decklist[i][MANACOST]:
+            if decklist[i][TYE] != "Land":
+                colorless += 1
+    
+    print(f"      Red |{"#" * red}")
+    print(f"    Black |{"#" * black}")
+    print(f"Colorless |{"#" * colorless}")
+    print(red, black, colorless)
+    print("UNDER CONSTRUCTION")

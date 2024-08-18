@@ -23,6 +23,7 @@ def clear():
     # for mac and linux(here, os.name is 'posix') 
     else: #For some reason my commputer kept trying to use clear despite being a windows pc so I changed this but now the program is broken on mac/linux probably :(
         _ = system('cls') 
+
 def cleanup():
    '''Looks over the top of the deck and removes all the [i][0] that equal 0'''
    while deck[0][IN_REGION] == 0:
@@ -41,11 +42,11 @@ def draw(num):
         counter += 1
     input("\n\n Press [ENTER] to continue: ")
 
-
-def shuffle():
+def shuffle(): 
     '''cleanup the deck and then shuffle'''
     cleanup()
     random.shuffle(deck)
+
 def viewZone(zone):
     
     print(f"\n\n # | {"Name":30} |\t {"Card Type":12} |\t {"M.Cost":6}")
@@ -54,7 +55,68 @@ def viewZone(zone):
         print(f"{i:2.0f} | {zone[i][NAME]:30} |\t {zone[i][TYPE]:12} |\t {zone[i][MANACOST]:6}")
 
 def stats():
-    print("UNDER CONSTRUCTION")
+
+    #print deck size
+    print(f"\n\nCards in Deck: {len(decklist)}")
+    print(f" Unique Cards: {uniqueCards}")
+    print("\n--------------------------------")
+    
+    #Card type graph
+    if creatures != 0: print(f"    Creatures |{"#" * creatures}")
+    if instants != 0: print(f"     Instants |{"#" * instants}")
+    if sorceries != 0: print(f"    Sorceries |{"#" * sorceries}")
+    if enchantments != 0: print(f" Enchantments |{"#" * enchantments}")
+    if artifacts != 0: print(f"    Artifacts |{"#" * artifacts}")
+    if planeswalkers != 0: print(f"Planeswalkers |{"#" * planeswalkers}")
+    if lands != 0: print(f"        Lands |{"#" * lands}")
+
+    print("--------------------------------\n")
+
+    #color pie
+    white = 0
+    blue = 0
+    black = 0
+    red = 0
+    green = 0
+    colorless = 0
+
+    #check for colors
+    for i in range(0, len(decklist)):
+        if "W" in decklist[i][MANACOST]:
+            white += 1
+        if "U" in decklist[i][MANACOST]:
+            blue += 1
+        if "B" in decklist[i][MANACOST]:
+            black += 1
+        if "R" in decklist[i][MANACOST]:
+            red += 1
+        if "G" in decklist[i][MANACOST]:
+            green += 1
+        if "W" not in decklist[i][MANACOST] and "U" not in decklist[i][MANACOST] and "B" not in decklist[i][MANACOST] and "R" not in decklist[i][MANACOST] and "G" not in decklist[i][MANACOST]:
+            if decklist[i][TYPE] != "Land":
+                colorless += 1
+    
+    #output color graph
+    print(f"      Red |{"#" * red}")
+    print(f"    Black |{"#" * black}")
+    print(f"Colorless |{"#" * colorless}")
+    print("--------------------------------\n")
+
+    #Calculate mana curve
+    curve = [0] * 10
+    for i in range(0,len(decklist)):
+        cMana = decklist[i][CMC]
+
+        #storing at 10 - cmc means the list is in reverse order
+        curve[9 - cMana] += 1 #curve[n] +1 where n is the converted mana cost of i in decklist
+    
+    #print manacurve graph
+
+    print("\tMana Curve")
+    for i in range(0, len(curve)):
+        if curve[i] != 0:
+            print(f"{9-i} |{"#" * curve[i]}")
+    
 
 def topdeck(num):
     cleanup()
@@ -86,7 +148,6 @@ def mill():
         print("\tInput must be a positive integer. Please try again")
         input("Press [ENTER] to continue: ")
         mill()
-
 
 def upkeep():
     print("*ALERT*")
@@ -156,7 +217,6 @@ def handMenu():
             clear()
             print("***ERROR: Invalid Entry***")
         
-
 def menu():
 
     #cleanup deck and clear the screen
@@ -166,6 +226,7 @@ def menu():
     #Display Deck,Hand,Graveyard sizes
     zoneInfo()
 
+    #Display options
     print("\n+--------------------------------+")
     print("| 1) Draw a card                 |")
     print("| 2) View Hand                   |")
@@ -181,40 +242,62 @@ def menu():
 
     choice = input("\n\nWhat would you like to do? ").lower()
     
+    #Draw 1 card from deck to hand
     if choice == "1" or choice == "draw":
         draw(1)
         return True
+    
+    #Open the hand menu
     elif choice == "2" or choice == "view" or choice == "hand":
         clear()
         handMenu()
         return True
+    
+    #View some deck statistics
     elif choice == "3" or choice == "check":
         stats()
+        input("Press [ENTER] to continue: ")
         return True
+    
+    #Reshuffle the deck
     elif choice == "4" or choice == "shuffle":
         shuffle()
         input("Deck Shuffled: Press [ENTER] to continue: ")
         return True
+    
+    #Take X cards from top of deck and put them into your graveyard
     elif choice == "5" or choice == "mill":
         mill()
         return True
+    
+    #View deck by calling viewZone with deck as target
     elif choice == "6" or choice == "deck":
         viewZone(deck)
         input("\n\n Press [ENTER] to continue: ")
         return True
+    
+    #Return all cards to deck, shuffle, and draw 7 new cards
     elif choice == "9" or choice == "restart":
         upkeep()
         return True
+    
+    #View graveyard by calling viewZone with graveyard as target
     elif choice == "7" or choice == "graveyard":
         viewZone(graveyard)
         input("\n\n Press [ENTER] to continue: ")
         return True
+    
+    #View complete ordered decklist by calling viewZone with decklist as target
     elif choice == "8" or choice == "decklist":
         viewZone(decklist)
         input("\n\n Press [ENTER] to continue: ")
         return True
+    
+    #Return False to break out of while loop and end program
     elif choice == "0" or choice == "exit":
         return False
+    
+    #Error message for invalid entries
     else:
         print("\n\n\t***Invalid Entry***")
         print(f"{choice} is not a valid command. Please try again")
@@ -244,6 +327,16 @@ deck = []
 hand = []
 graveyard = []
 
+#Deck Stats
+uniqueCards = 0
+creatures = 0
+instants = 0
+sorceries = 0
+enchantments = 0
+artifacts = 0
+lands = 0
+planeswalkers = 0
+
 #-----Program initialization process.  Open doc, make cards, add to deck--------
 #open document
 with open("labs_and_assignments/cards.csv") as csvfile:
@@ -256,32 +349,40 @@ with open("labs_and_assignments/cards.csv") as csvfile:
         #Card Type
         if rec[TYPE].lower() == "c":
             type.append("Creature")
+            creatures += quantity[-1]
 
         elif rec[TYPE].lower() == "i":
+            instants += quantity[-1]
             type.append("Instant")   
 
         elif rec[TYPE].lower() == "s":
+            sorceries += quantity[-1]
             type.append("Sorcery")   
 
         elif rec[TYPE].lower() == "e":
+            enchantments += quantity[-1]
             type.append("Enchantment")  
 
         elif rec[TYPE].lower() == "a":
+            artifacts += quantity[-1]
             type.append("Artifact")
 
         elif rec[TYPE].lower() == "l":
+            lands += quantity[-1]
             type.append("Land")   
 
         elif rec[TYPE].lower() == "p":
+            planeswalkers += quantity[-1]
             type.append("Planeswalker")
 
         #mana cost + cmc (converted mana cost)
         manaCost.append(rec[MANACOST])
-        cmc.append(rec[CMC])           
+        cmc.append(int(rec[CMC]))           
 #Close document
 
 #Assemble the deck for the first time
 for i in range(0, len(quantity)):
+    uniqueCards += 1
     card = []
     card.append(True)
     card.append(name[i])
@@ -296,31 +397,19 @@ for i in range(0, len(quantity)):
 decklist = deck.copy()
 decksize = len(decklist)
 
+#stats()
+#input("Press [ENTER] to continue: ")
+
 #Shuffle and then Draw 7 cards at the start because that's how Magic works
 zoneInfo()
 shuffle()
 draw(7)
 
+
 #Program Loop
 cont = True
 while cont == True:
-
+    
     cont = menu()
 
-#--------------------------Testing area
-#print(deck)
-#shuffle()
-#draw(5)
-#for i in range(0,len(deck)):
-#    print(deck[i][IN_REGION])
-#shuffle()
-#or i in range(0,len(deck)):
-#   print(deck[i][IN_REGION])
-#print(hand)
-#test = [1,2,3,4,5]
-#test2 = [6,7,8,9]
-#est2.append(test.pop(0))
-#print(test)
-#print(test2)
-
-
+print("Thank you, goodbye :3")

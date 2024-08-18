@@ -11,3 +11,7 @@
 
 #---Main Code-----
 print("Hello World")
+
+test = "3"
+test += "3" * 4
+print(test)
