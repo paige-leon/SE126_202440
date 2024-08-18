@@ -15,14 +15,14 @@ from os import system, name
 
 #---Functions-------------
 def clear(): 
-    '''clears the screen'''
+
     # for windows 
     if name == 'nt': 
         _ = system('cls') 
 
     # for mac and linux(here, os.name is 'posix') 
-    else: 
-        _ = system('clear') 
+    else: #For some reason my commputer kept trying to use clear despite being a windows pc so I changed this but now the program is broken on mac/linux probably :(
+        _ = system('cls') 
 def cleanup():
    '''Looks over the top of the deck and removes all the [i][0] that equal 0'''
    while deck[0][IN_REGION] == 0:
@@ -35,44 +35,147 @@ def draw(num):
     counter = 0
 
     while num > counter:
+        print(f"Drew: {deck[counter][NAME]}")
         hand.append(deck[counter].copy()) #this is crazy, who decided it was a good idea to make lists act this way
         deck[counter][IN_REGION] = False
         counter += 1
+    input("\n\n Press [ENTER] to continue: ")
+
+
 def shuffle():
     '''cleanup the deck and then shuffle'''
     cleanup()
     random.shuffle(deck)
-def viewHand():
-    print("UNDER CONSTRUCTION")
+def viewZone(zone):
+    
+    print(f"\n\n # | {"Name":30} |\t {"Card Type":12} |\t {"M.Cost":6}")
+    print("================================================================")
+    for i in range(0,len(zone)):
+        print(f"{i:2.0f} | {zone[i][NAME]:30} |\t {zone[i][TYPE]:12} |\t {zone[i][MANACOST]:6}")
+
 def stats():
     print("UNDER CONSTRUCTION")
-def topdeck():
-    print("UNDER CONSTRUCTION")
-def discard():
-    print("UNDER CONSTRUCTION")
-def mill():
-    print("UNDER CONSTRUCTION")
-def upkeep():
-    print("UNDER CONSTRUCTION")
-def menu():
 
+def topdeck(num):
     cleanup()
+    deck.insert(0,hand.pop(num))
 
+def discard(num):
+    graveyard.append(hand.pop(num))
+
+def mill():
+
+    #Clear screen, cleanup deck, and display cards in all zones
+    clear()
+    cleanup()
+    zoneInfo()
+
+    choice = input("How many cards would you like to mill? ")
+
+    try:
+        count = int(choice)
+        while count > 0:
+            print(f"Milled: {deck[0][NAME]}")
+            graveyard.append(deck.pop(0))
+            count -= 1
+        print(f"\n{choice} cards milled.")
+        input("\nPress [ENTER] to continue: ")
+
+    except:
+        print("\n\n\t***INVALID ENTRY***")
+        print("\tInput must be a positive integer. Please try again")
+        input("Press [ENTER] to continue: ")
+        mill()
+
+
+def upkeep():
+    print("*ALERT*")
+    print("Are you sure you want to restart?  You cannot undo this")
+    choice = input("[YES/NO]").lower()
+    if choice == "yes":
+        
+        #remove items from lists until 100% empty
+        while len(deck) > 0:
+            deck.pop(0)
+        while len(hand) > 0:
+            hand.pop(0)
+        while len(graveyard) > 0:
+            graveyard.pop(0)
+
+        for i in range(0,len(decklist)):
+            deck.append(decklist[i])
+        
+        #Shuffle and Draw 7
+        shuffle()
+        draw(7)
+
+    else:
+        input("Returning to Main Menu.  Press [ENTER] to continue: ")
+
+def zoneInfo():
     print("\t+-----------+")
     print(f"\t|Deck: {len(deck):2.0f}   |")
     print(f"\t|Hand: {len(hand):2.0f}   |")
-    print(f"\t|Dscd: {len(discard):2.0f}   |")
+    print(f"\t|Dscd: {len(graveyard):2.0f}   |")
     print("\t+-----------+")
+
+def handMenu():
+    choice = -1
+    
+    while choice != "0":
+        clear()
+        zoneInfo()
+        viewZone(hand)
+        print("+------------------------+")
+        print("| 1) Discard a card      |")
+        print("| 2) Top deck a card     |")
+        print("| 0) Return to Main Menu |")
+        print("+------------------------+")
+
+        choice = input("\n\n\tWhat do you want to do? ").lower()
+
+        if choice == "1":
+            choice2 = input("\tWhich card # you want to discard? ")
+
+            try:
+                choice2 = int(choice2)
+                discard(choice2)
+
+            except:
+                input(f"ERROR: Input must be an integer between 0 and {len(hand) - 1}")
+        elif choice == "2":
+            choice2 = input("\tWhich card # you want to return to the top of the deck? ")
+
+            try:
+                choice2 = int(choice2)
+                topdeck(choice2)
+
+            except:
+                input(f"ERROR: Input must be an integer between 0 and {len(hand) - 1}")
+        elif choice != "0":
+            clear()
+            print("***ERROR: Invalid Entry***")
+        
+
+def menu():
+
+    #cleanup deck and clear the screen
+    cleanup()
+    clear()
+
+    #Display Deck,Hand,Graveyard sizes
+    zoneInfo()
 
     print("\n+--------------------------------+")
     print("| 1) Draw a card                 |")
     print("| 2) View Hand                   |")
     print("| 3) Check Deck Stats            |")
-    print("| 4) Return Card to Top of Deck  |")
-    print("| 5) Shuffle Deck                |")
-    print("| 6) Discard a card              |")
-    print("| 7) Mill Cards                  |")
-    print("| 8) Restart                     |")
+    print("| 4) Shuffle Deck                |")
+    print("| 5) Mill Cards                  |")
+    print("| 6) View Deck                   |")
+    print("| 7) Check Graveyard             |")
+    print("| 8) View Decklist               |")
+    print("| 9) Restart                     |")
     print("| 0) Exit                        |")
     print("+--------------------------------+")
 
@@ -82,19 +185,33 @@ def menu():
         draw(1)
         return True
     elif choice == "2" or choice == "view" or choice == "hand":
+        clear()
+        handMenu()
         return True
     elif choice == "3" or choice == "check":
+        stats()
         return True
-    elif choice == "4" or choice == "return":
-        return True
-    elif choice == "5" or choice == "shuffle":
+    elif choice == "4" or choice == "shuffle":
         shuffle()
+        input("Deck Shuffled: Press [ENTER] to continue: ")
         return True
-    elif choice == "6" or choice == "discard":
+    elif choice == "5" or choice == "mill":
+        mill()
         return True
-    elif choice == "7" or choice == "mill":
+    elif choice == "6" or choice == "deck":
+        viewZone(deck)
+        input("\n\n Press [ENTER] to continue: ")
         return True
-    elif choice == "8" or choice == "restart":
+    elif choice == "9" or choice == "restart":
+        upkeep()
+        return True
+    elif choice == "7" or choice == "graveyard":
+        viewZone(graveyard)
+        input("\n\n Press [ENTER] to continue: ")
+        return True
+    elif choice == "8" or choice == "decklist":
+        viewZone(decklist)
+        input("\n\n Press [ENTER] to continue: ")
         return True
     elif choice == "0" or choice == "exit":
         return False
@@ -125,7 +242,7 @@ cmc = []
 #Variables that are actually used more than once
 deck = []
 hand = []
-discard = []
+graveyard = []
 
 #-----Program initialization process.  Open doc, make cards, add to deck--------
 #open document
@@ -180,6 +297,7 @@ decklist = deck.copy()
 decksize = len(decklist)
 
 #Shuffle and then Draw 7 cards at the start because that's how Magic works
+zoneInfo()
 shuffle()
 draw(7)
 
@@ -187,24 +305,22 @@ draw(7)
 cont = True
 while cont == True:
 
-    #TESTING AREA PT 2
     cont = menu()
 
 #--------------------------Testing area
 #print(deck)
-shuffle()
-draw(5)
-for i in range(0,len(deck)):
-    print(deck[i][IN_REGION])
-shuffle()
-for i in range(0,len(deck)):
-    print(deck[i][IN_REGION])
-
-print(hand)
-test = [1,2,3,4,5]
-test2 = [6,7,8,9]
-test2.append(test.pop(0))
-print(test)
-print(test2)
+#shuffle()
+#draw(5)
+#for i in range(0,len(deck)):
+#    print(deck[i][IN_REGION])
+#shuffle()
+#or i in range(0,len(deck)):
+#   print(deck[i][IN_REGION])
+#print(hand)
+#test = [1,2,3,4,5]
+#test2 = [6,7,8,9]
+#est2.append(test.pop(0))
+#print(test)
+#print(test2)
 
 
