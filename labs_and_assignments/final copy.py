@@ -298,38 +298,35 @@ def followTrick(lead, leader):
 def scoreTrick(lead, follow, leader):
     '''Return true if leading player wins the trick.  Return false if leading player lost the trick'''
     if leader == True:
-        print(f"\nYou led with the {lead[0]} of {lead[1]}")
+        print(f"You led with the {lead[0]} of {lead[1]}")
         print(f"The AI followed with the {follow[0]} of {follow[1]}")
     else:
-        print(f"\nThe AI led with the {lead[0]} of {lead[1]}")
+        print(f"The AI led with the {lead[0]} of {lead[1]}")
         print(f"You followed with the {follow[0]} of {follow[1]}")
 
     if lead[1] == follow[1]: #following player played on suit
         if lead[0] >= follow[0]: #leading player had higher value
             if leader == True:
-                print("\n\tYou won the trick!")
+                print("You won the trick!")
                 return True
             else:
-                print("\n\tYou lost the trick! [lower number]")
+                print("You lost the trick! [lower number]")
                 return False
         else: #leading player had lower value
             if leader == True:
-                print("\n\tYou lost the trick.. [lower number]")
+                print("You lost the trick.. [lower number]")
                 return False
             else:
-                print("\n\tYou won the trick!")
+                print("You won the trick!")
                 return True
     else:
         if leader == True:
-            print("\n\tYou won the trick [Opponent played off suit]")
+            print("You won the trick [Opponent played off suit]")
             return True #ai played off suit
         else:        
-            print("\n\tYou lost the trick [played off suit]")
+            print("You lost the trick [played off suit]")
             return False #player played off suit
 
-def lenAIHand():
-    aiLength = len(aiHandD) + len(aiHandS) + len(aiHandF) + len(aiHandP)
-    return aiLength
 
 def daggers(lead, follow):
     print()
@@ -393,66 +390,13 @@ playerTricks = 0
 aiTricks = 0
 
 #Game Loop
-while len(playerHand) > 0 and lenAIHand() > 0:
+while len(playerHand) > 0:
 
     #AI leading Loop
     if playerLeading == False:
         aiField = leadTrick(playerLeading)
         playerField = followTrick(aiField,playerLeading)
         playerLeading = scoreTrick(aiField,playerField,playerLeading)
-
-        #Powers go here (ai WAS leading)
-        if playerLeading == False: #CPU was leading and won
-            if aiField[1] == "Daggers":
-                
-                #Attack step
-                attack = aiField[0]
-                if playerField[1] == "Daggers": #If opponent plays on suit, reduce damage taken
-                    attack -= playerField[0] 
-                   
-                    #If same value played, opponent doesn't reduce damage
-                    if attack == 0: 
-                        attack = aiField[0]
-                
-                #Opponent doesn't have shield
-                if playerShield <= 0:
-                    print(f"\n\CPU has dealt {attack} damage!")
-                    playerHealth -= attack
-                    print(f"\tYou are now at {playerHealth}HP.")
-                
-                #If they have shield, deal that much damage to shield, overspill does not trample to HP
-                else:
-                    print("\n\tThe opponent blocked the attack!")
-                    playerShield -= attack
-                    if playerShield < 0:
-                        playerShield = 0
-
-            #Create shield.  No opponent interaction here
-            elif aiField[1] == "Shields":
-                print(f"\n\tCPU gains {aiField[0]} shield points!")
-                aiShield += aiField[0]
-                print(f"\tCPU now has {aiShield} shield points.")
-
-            #Feathers, draw 2
-            elif aiField[1] == "Feathers":
-                print("\n\tCPU nimbly dodges away! They draw 2 cards")
-                draw(2, aiHand)
-            
-            #Potions: Gain HP.  That's it
-            elif aiField[1] == "Potions":
-                print("\n\tCPU takes a healing potion!")
-                print(f"\tThey heal {aiField[0]}HP.")
-                aiHealth += aiField[0]
-                print(f"\tThey now have {aiHealth}HP")
-        
-        #Weak attack (leader lost the trick)
-        else: 
-            weakAtk = playerField[0] - 3
-            if weakAtk <= 0:
-                weakAtk = 1
-            aiHealth -= weakAtk
-            print(f"\n\tYour deal {weakAtk} damage")
-            print(f"\tCPU is now at {aiHealth}")
     
     #Player leading Loop
     else:
@@ -460,101 +404,21 @@ while len(playerHand) > 0 and lenAIHand() > 0:
         aiField = followTrick(playerField,playerLeading)
         playerLeading = scoreTrick(playerField, aiField, playerLeading)
 
-        #Powers go here (player WAS leading)
-        if playerLeading == True: #player was leading and won
-            if playerField[1] == "Daggers":
-                
-                #Attack step
-                attack = playerField[0]
-                if aiField[1] == "Daggers": #If opponent plays on suit, reduce damage taken
-                    attack -= aiField[0] 
-                   
-                    #If same value played, opponent doesn't reduce damage
-                    if attack == 0: 
-                        attack = playerField[0]
-                
-                #Opponent doesn't have shield
-                if aiShield <= 0:
-                    print(f"\n\tYou have dealt {attack} damage!")
-                    aiHealth -= attack
-                    print(f"\tCPU is now at {aiHealth}HP.")
-                
-                #If they have shield, deal that much damage to shield, overspill does not trample to HP
-                else:
-                    print("\n\tThe opponent blocked the attack!")
-                    aiShield -= attack
-                    if aiShield < 0:
-                        aiShield = 0
-
-            #Create shield.  No opponent interaction here
-            elif playerField[1] == "Shields":
-                print(f"\n\tYou gain {playerField[0]} shield points!")
-                playerShield += playerField[0]
-                print(f"\tYou now have {playerShield} shield points.")
-
-            #Feathers, draw 2
-            elif playerField[1] == "Feathers":
-                print("\n\tYou nimbly dodge away! Draw 2 cards")
-                draw(2, playerHand)
-            
-            #Potions: Gain HP.  That's it
-            elif playerField[1] == "Potions":
-                print("\n\tYou take a healing potion!")
-                print(f"\tYou heal {playerField[0]}HP.")
-                playerHealth += playerField[0]
-                print(f"\tYou now have {playerHealth}HP")
-        
-        #Weak attack (leader lost the trick)
-        else: 
-            weakAtk = aiField[0] - 3
-            if weakAtk <= 0:
-                weakAtk = 1
-            playerHealth -= weakAtk
-            print(f"\n\tCPU player deals {weakAtk} damage")
-            print(f"\tYou are now at {playerHealth}")
-
-
-    #Tricks won (for tie breaker?)
     if playerLeading == True:
         playerTricks += 1
     elif playerLeading == False:
         aiTricks += 1
 
-    #Win by Damage
-    if playerHealth <= 0:
-        print("\n\n\tYou have run out of HP.")
-        break #I KNOW THIS IS BAD BUT THIS FELT CLEANER THAN HAVING AN ABOMINATION OF A WHILE LOOP THAT CHECKED FOR BOTH HAND SIZE AND ALSO HP
-    elif aiHealth <= 0:
-        print("\n\n\tCPU has run out of HP")
-        break
-
-    #Game end by empty hand
-    if lenAIHand() == 0:
-        print(f"\n\n\tCPU is out of cards. You deal a final {len(playerHand)} damage to them")
-        aiHealth -= len(playerHand)
-        if aiHealth < 0:
-            aiHealth = 0
-    if len(playerHand) == 0:
-        print(f"\n\n\tYou are out of cards.  CPU deals a final {lenAIHand()} damage to you")
-        playerHealth -= lenAIHand()
-        if playerHealth < 0:
-            playerHealth = 0
-
 #Winner message
-if playerHealth > aiHealth:
+if playerTricks > aiTricks:
     winner = "you!"
-elif playerHealth < aiHealth:
+elif playerTricks < aiTricks:
     winner = "the AI.."
 else:
     winner = "nobody.  You tied the game :O"
 
-#Won through message
-if playerHealth > 0 and aiHealth > 0:
-    cause = "through out maneuvering their opponent"
-else:
-    cause = "by destroying their opponent"
 #Print Results
 print("\n\n\t ~~Final Results~~")
-print(f"You: {playerHealth}HP")
-print(f" AI: {aiHealth}HP")
-print(f"\nThe winner is {winner} {cause}")
+print(f"You: {playerTricks} tricks won")
+print(f" AI: {aiTricks} tricks won")
+print(f"\nThe winner is {winner}")
